@@ -1,5 +1,5 @@
-# Étape 1 : Utiliser l'image node alpine
-FROM node:22-alpine3.19 AS dev
+# Étape 1 : Construction
+FROM node:22-alpine3.19 AS builder
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -13,13 +13,30 @@ RUN npm install --frozen-lockfile
 # Copier le reste de l'application
 COPY . .
 
-# Passer les variables d'environnement
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Construire l'application
+RUN npm run build
+
+# Étape 2 : Production
+FROM node:22-alpine3.19 AS production
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Définir l'environnement principal
 ENV NODE_ENV=development
 
-# Exposer le port 3000 pour l'application Next.js
+# Copier le fichier package.json nécessaire pour npm start
+COPY --from=builder /app/package.json ./
+
+# Copier les fichiers construits depuis l'étape de construction
+COPY --from=builder /app/next.config.js .
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.env ./.env
+
+# Exposer le port
 EXPOSE 3000
 
-# Démarrer l'application en mode développement
-CMD ["npm", "run", "dev"]
+# Démarrer l'application
+CMD ["npm", "start"]
