@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store
+  template:
+    metadata:
+      labels:
+        app: store
+    spec:
+      containers:
+      - name: store
+        image: devcloudarmel/store:v1.0.3
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 3000
+        env:
+          - name: NEXT_PUBLIC_API_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets-store
+                key: NEXT_PUBLIC_API_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: store
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
