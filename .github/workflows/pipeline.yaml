@@ -50,4 +50,5 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
+          kubectl apply -f production/secrets-store.yaml
           kubectl apply -f production/store.yaml
