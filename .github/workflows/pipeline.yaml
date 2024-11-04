@@ -45,8 +45,8 @@ jobs:
       # Étape 7 : Créer ou mettre à jour le namespace et déployer les manifests
       - name: Create namespace if not exists
         run: |
-          kubectl get namespace health-master-ns || kubectl create namespace health-master-ns
-          kubectl config set-context --current --namespace=health-master-ns
+          kubectl get namespace store-master-ns || kubectl create namespace store-master-ns
+          kubectl config set-context --current --namespace=store-master-ns
 
       - name: Apply Kubernetes manifests
         run: |
