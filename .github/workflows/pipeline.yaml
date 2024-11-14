@@ -36,11 +36,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: af-south-1
+          aws-region: eu-west-3
 
       # Étape 6 : Mettre à jour la configuration du cluster EKS
       - name: Update kube config
-        run: aws eks update-kubeconfig --name projet-master-eks --region af-south-1
+        run: aws eks update-kubeconfig --name projet-master-eks --region eu-west-3
 
       # Étape 7 : Créer ou mettre à jour le namespace et déployer les manifests
       - name: Create namespace if not exists
@@ -52,3 +52,6 @@ jobs:
         run: |
           kubectl apply -f production/secrets-store.yaml
           kubectl apply -f production/store.yaml
+
+      - name: Force restart pods
+        run: kubectl rollout restart deployment/store-deployment
